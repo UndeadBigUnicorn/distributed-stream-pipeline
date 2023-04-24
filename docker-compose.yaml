@@ -12,11 +12,13 @@ services:
     ports:
       - 8085:8080
       - 7077:7077
-      - 4040:4040 # Driver
+      - 9099:9099 # Driver
     environment:
       - SPARK_MODE=master
     volumes:
       - ./config/spark/metrics.properties:/opt/bitnami/spark/conf/metrics.properties
+      - ./src:/app
+      - ./data:/data
       # - ./config/spark/spark-defaults.conf:/opt/bitnami/spark/conf/spark-defaults.conf
 
   spark-worker:
@@ -26,7 +28,7 @@ services:
       - spark
     ports:
       - 8081:8081
-      - 4041:4040 # Driver
+      - 90999:9099 # Driver
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark:7077

@@ -35,22 +35,10 @@ if __name__ == "__main__":
     streamReader = HotelReviewStreamReader(sparkSession)
     hotelReviewStream = streamReader.read()
 
-    print("Query recieved")
-    # print("# Elements in the batch, columns: ")
-    # print((hotelReviewStream.count(), hotelReviewStream.columns))
-    # print("First elements in the batch: ")
-    # print((hotelReviewStream.head(2)))
-
-    print("Predicting rating...")
     # predict rating
     hotelReviewRatingDF = reviewClassifier(hotelReviewStream)
-    # print("# Elements in the batch, columns: ")
-    # print((hotelReviewRatingDF.count(), hotelReviewRatingDF.columns))
-    # print("First elements in the batch: ")
-    # print((hotelReviewRatingDF.head(2)))
 
     # write back to Kafka
     streamWriter = HotelReviewStreamWriter(sparkSession)
     query = streamWriter.write(hotelReviewRatingDF)
     query.awaitTermination()
-    print(query)

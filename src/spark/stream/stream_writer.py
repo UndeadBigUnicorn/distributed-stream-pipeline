@@ -36,5 +36,3 @@ class HotelReviewStreamWriter(object):
             .option("checkpointLocation", "/tmp/checkpoint") \
             .outputMode("append") \
             .start()
-            # .option("asyncProgressTrackingEnabled", "true") \
-            # .foreachBatch(lambda df, epoch_id: print((df.head(2)))) \

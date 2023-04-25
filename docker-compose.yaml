@@ -2,7 +2,7 @@ version: '3'
 
 volumes:
   prometheus_data: {}
-  grafana_data: {}
+  grafana_data_v3: {}
 
 services:
 
@@ -28,7 +28,7 @@ services:
       - spark
     ports:
       - 8081:8081
-      - 90999:9099 # Driver
+      - 10099:9099 # Driver
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER_URL=spark://spark:7077
@@ -76,6 +76,7 @@ services:
 
   jmx-kafka:
     image: "sscaling/jmx-prometheus-exporter"
+    # restart: always
     ports:
      - "5556:5556"
     environment:
@@ -149,17 +150,18 @@ services:
     # volumes:
     #   - config/kafka_ui_config.yml:/etc/kafkaui/dynamic_config.yaml
 
-  # kafka-init-topics:
-  #   image: confluentinc/cp-kafka:7.3.2
-  #   volumes:
-  #      - ./message.json:/data/message.json
-  #   depends_on:
-  #     - kafka
-  #   command: "bash -c 'echo Waiting for Kafka to be ready... && \
-  #              cub kafka-ready -b kafka:29092 1 30 && \
-  #              kafka-topics --create --topic users --partitions 3 --replication-factor 1 --if-not-exists --bootstrap-server kafka:29092 && \
-  #              kafka-topics --create --topic messages --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka:29092 && \
-  #              kafka-console-producer --bootstrap-server kafka:29092 --topic users < /data/message.json'"
+  kafka-init-topics:
+    container_name: kafka-init-topics
+    image: confluentinc/cp-kafka:7.3.2
+    volumes:
+       - ./data/reviews.json:/data/reviews.json
+    depends_on:
+      - kafka
+    command: "bash -c 'echo Waiting for Kafka to be ready... && \
+               cub kafka-ready -b kafka:29092 1 30 && \
+               kafka-topics --create --topic hotel-reviews --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka:29092 && \
+               kafka-topics --create --topic hotel-reviews-ratings --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka:29092 && \
+               kafka-console-producer --bootstrap-server kafka:29092 --topic hotel-reviews < /data/reviews.json'"
 
   prometheus:
     container_name: prometheus
@@ -193,14 +195,15 @@ services:
   grafana:
     container_name: grafana
     image: grafana/grafana
-    # user: '472'
+    user: '472'
     restart: always
     environment:
       GF_INSTALL_PLUGINS: 'grafana-clock-panel,grafana-simple-json-datasource'
+      GF_USERS_ALLOW_SIGN_UP: 'false'
     volumes:
-      - grafana_data:/var/lib/grafana
+      - grafana_data_v3:/var/lib/grafana
       - ./config/grafana/dashboards:/var/lib/grafana/dashboards
-      - ./config/grafana/provisioning/:/etc/grafana/provisioning/
+      - ./config/grafana/provisioning/:/etc/grafana/provisioning
     env_file:
       - ./config/grafana/config.monitoring
     ports:

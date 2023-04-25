@@ -88,6 +88,6 @@ scrape_configs:
 
 remote_write:
   - url: 'http://grafana:3000'
-    basic_auth:
-      username: 'admin'
-      password: 'eyJrIjoiQ2IydTJ4M1ZsdmVJY01uTjZFR2dlWUVpeFV4enhQMHQiLCJuIjoicHJvbWV0aGV1cyIsImlkIjoxfQ=='
+    authorization:
+      type: 'Bearer'
+      credentials: 'eyJrIjoiNnRTWjFGcHRmY0R0OTIweWs4d3FpeTI4MDFZQjFEQlQiLCJuIjoicHJvbWV0aGV1c193cml0ZXIiLCJpZCI6MX0='

@@ -3,7 +3,7 @@
 """
 Train the Logistic Regression model.
 
-Usage: train.py
+Usage: spark-submit
 """
 
 from pyspark.sql import SparkSession
@@ -36,7 +36,7 @@ if __name__ == "__main__":
     # train the model
     reviewClassifier = ReviewClassifier(sparkSession)
     reviewClassifier.fit(hotelReviewsDF)
-    reviewClassifier.save("hotel-classifier")
+    reviewClassifier.save("/data/hotel-classifier")
 
     print("Evaluating the model...")
 

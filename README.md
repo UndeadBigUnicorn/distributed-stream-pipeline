@@ -15,7 +15,7 @@ The system represents a real-time hotel review stream pipeline. The pipeline its
 
 ## Architecture
 
-![alt text](img/spark-streaming-rich-picture.png "Architecture")
+![alt text](img/spark-streaming-rich-picture.jpg "Architecture")
 
 The architecture contains of multiple datasources that are writing into the Apache Kafka queue:
 * `Telegram Bot` represents a user client, where user could give a review of they stay in the hotel.

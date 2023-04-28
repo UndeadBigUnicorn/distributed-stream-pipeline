@@ -228,3 +228,11 @@ services:
     restart: always
     deploy:
       mode: global
+
+  data-dispatcher:
+    container_name: data-dispatcher
+    build: src/dispatcher
+    ports:
+      - 8222:8222
+    depends_on:
+      - kafka

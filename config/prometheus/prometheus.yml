@@ -43,6 +43,12 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
+  - job_name: 'hotel-reviews'
+    # Override the global default and scrape targets from this job every 5 seconds.
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['data-dispatcher:8222']
+
   - job_name: 'kafka'
     # metrics_path defaults to '/metrics'
     # scheme defaults to 'http'.

@@ -19,10 +19,11 @@ class HotelReviewStreamWriter(object):
             df (DataFrame): predicted ratings for hotel reviews
         """
         uuidUdf = f.udf(lambda : str(uuid.uuid4()), StringType())
-        # keep only 2 columns
+        # keep only 3 columns
         df = df \
             .withColumn("rating", f.col("prediction")) \
-            .select(f.col("review"), f.col("rating"))
+            .select(f.col("review"), f.col("rating"), f.col("sensor_time"))
+
         # dataframe should have key, value
         # convert columns into 1 json value and generate a key
         return df \

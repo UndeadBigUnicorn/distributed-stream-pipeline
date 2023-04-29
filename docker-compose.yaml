@@ -161,6 +161,7 @@ services:
                cub kafka-ready -b kafka:29092 1 30 && \
                kafka-topics --create --topic hotel-reviews --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka:29092 && \
                kafka-topics --create --topic hotel-reviews-ratings --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka:29092 && \
+               kafka-topics --create --topic statistics --partitions 2 --replication-factor 1 --if-not-exists --bootstrap-server kafka:29092 && \
                kafka-console-producer --bootstrap-server kafka:29092 --topic hotel-reviews < /data/reviews.json'"
 
   prometheus:

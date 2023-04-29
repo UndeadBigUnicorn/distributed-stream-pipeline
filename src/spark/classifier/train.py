@@ -22,7 +22,7 @@ if __name__ == "__main__":
         .config("spark.driver.cores", 8) \
         .config("spark.executor.memory", "8g") \
         .config("spark.driver.memory", "8g")\
-        .config("spark.sql.shuffle.partitions" , "800") \
+        .config("spark.sql.shuffle.partitions", "800") \
         .getOrCreate()
     # change log level to WARN
     sparkSession.sparkContext.setLogLevel("WARN")
@@ -44,10 +44,24 @@ if __name__ == "__main__":
     evaluator = MulticlassClassificationEvaluator()\
         .setLabelCol("rating")\
         .setPredictionCol("prediction")\
-        .setMetricName("accuracy")
+        .setMetricName("accuracy")\
+        .setMetricName("weightedPrecision")\
+        .setMetricName("weightedRecall")\
+        .setMetricName("f1")
 
     testDf = datasetLoader.load("/data/test_data.csv")
     predictedTestDF = reviewClassifier(testDf)
-    accuracy = evaluator.evaluate(predictedTestDF, {evaluator.metricName: "accuracy"})
+    accuracy = evaluator.evaluate(predictedTestDF,
+                                  {evaluator.metricName: "accuracy"})
+    # Using weighted metrics to account for class imbalance
+    precision = evaluator.evaluate(predictedTestDF,
+                                   {evaluator.metricName: "weightedPrecision"})
+    recall = evaluator.evaluate(predictedTestDF,
+                                {evaluator.metricName: "weightedRecall"})
+    f1_score = evaluator.evaluate(predictedTestDF,
+                                  {evaluator.metricName: "f1"})
 
     print("Accuracy on the test dataset: %f" % accuracy)
+    print("Precision on the test dataset: %f" % precision)
+    print("Recall on the test dataset: %f" % recall)
+    print("F1 score on the test dataset: %f" % f1_score)

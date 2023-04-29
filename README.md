@@ -23,7 +23,7 @@ The architecture contains of multiple datasources that are writing into the Apac
 
 The project exploits the Apache Spark ability to process real-time data in 2 modes:
 * `streaming` mode - read hotel review from the Kafka queue and predict a rating for this review using the ML model while working in the `append` mode.
-* `batch processing` mode - calculate stats for hotel reviews while working in the `complete` mode.
+* `batch processing` mode - calculate stats for hotel reviews while working in the `complete` mode using the stream operators and window functions.
 
 Prometheus and Grafana is used to collect metrics and stream output data and display it on dashboards.
 

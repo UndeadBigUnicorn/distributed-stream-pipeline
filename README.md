@@ -9,7 +9,7 @@ Content:
   - [License](#license)
 
 ## Description
-This project aims to be a learning experience for implementing Lambda streaming architecture for processing real-time data and use it on the real example.
+This project aims to be a learning experience for implementing Lambda streaming architecture for processing real-time data and use it in the real example.
 
 The system represents a real-time hotel review stream pipeline. The pipeline itself gathers data from multiple data sources, assigns a rating to a hotel review in a stream matter, and calculates summary stats of hotel reviews in batch manner. The output is consumed by a timeseries database and is displayed on the dashboard.
 

@@ -44,15 +44,12 @@ if __name__ == "__main__":
     evaluator = MulticlassClassificationEvaluator()\
         .setLabelCol("rating")\
         .setPredictionCol("prediction")\
-        .setMetricName("accuracy")\
         .setMetricName("weightedPrecision")\
         .setMetricName("weightedRecall")\
         .setMetricName("f1")
 
     testDf = datasetLoader.load("/data/test_data.csv")
     predictedTestDF = reviewClassifier(testDf)
-    accuracy = evaluator.evaluate(predictedTestDF,
-                                  {evaluator.metricName: "accuracy"})
     # Using weighted metrics to account for class imbalance
     precision = evaluator.evaluate(predictedTestDF,
                                    {evaluator.metricName: "weightedPrecision"})
@@ -61,7 +58,6 @@ if __name__ == "__main__":
     f1_score = evaluator.evaluate(predictedTestDF,
                                   {evaluator.metricName: "f1"})
 
-    print("Accuracy on the test dataset: %f" % accuracy)
     print("Precision on the test dataset: %f" % precision)
     print("Recall on the test dataset: %f" % recall)
     print("F1 score on the test dataset: %f" % f1_score)

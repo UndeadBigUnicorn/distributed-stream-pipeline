@@ -75,7 +75,7 @@ services:
       KAFKA_JMX_HOSTNAME: kafka
 
   jmx-kafka:
-    image: "sscaling/jmx-prometheus-exporter"
+    image: sscaling/jmx-prometheus-exporter:0.12.0
     # restart: always
     ports:
      - "5556:5556"
@@ -87,56 +87,11 @@ services:
     depends_on:
      - kafka
 
-  schemaregistry:
-    image: confluentinc/cp-schema-registry:7.3.2
-    container_name: schemaregistry
-    ports:
-      - 18085:8085
-    depends_on:
-      - kafka
-    environment:
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:29092
-      SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: PLAINTEXT
-      SCHEMA_REGISTRY_HOST_NAME: schemaregistry
-      SCHEMA_REGISTRY_LISTENERS: http://schemaregistry:8085
-
-      SCHEMA_REGISTRY_SCHEMA_REGISTRY_INTER_INSTANCE_PROTOCOL: "http"
-      SCHEMA_REGISTRY_LOG4J_ROOT_LOGLEVEL: INFO
-      SCHEMA_REGISTRY_KAFKASTORE_TOPIC: _schemas
-
-  kafka-connect:
-    image: confluentinc/cp-kafka-connect:6.0.1
-    container_name: kafka_connect
-    ports:
-      - 8083:8083
-    depends_on:
-      - kafka
-      - schemaregistry
-    environment:
-      CONNECT_BOOTSTRAP_SERVERS: kafka:29092
-      CONNECT_GROUP_ID: compose-connect-group
-      CONNECT_CONFIG_STORAGE_TOPIC: _connect_configs
-      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
-      CONNECT_OFFSET_STORAGE_TOPIC: _connect_offset
-      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
-      CONNECT_STATUS_STORAGE_TOPIC: _connect_status
-      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
-      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
-      CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL: http://schemaregistry:8085
-      CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.storage.StringConverter
-      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schemaregistry:8085
-      CONNECT_INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-      CONNECT_INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
-      CONNECT_REST_ADVERTISED_HOST_NAME: kafka-connect
-      CONNECT_PLUGIN_PATH: "/usr/share/java,/usr/share/confluent-hub-components"
-
   kafka-ui:
     container_name: kafka-ui
-    image: provectuslabs/kafka-ui:latest
+    image: provectuslabs/kafka-ui:v0.6.2
     depends_on:
       - kafka
-      - schemaregistry
-      - kafka-connect
     ports:
       - 8088:8080
     environment:
@@ -144,9 +99,6 @@ services:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
       KAFKA_CLUSTERS_0_METRICS_PORT: 9997
-      KAFKA_CLUSTERS_0_SCHEMAREGISTRY: http://schemaregistry:8085
-      KAFKA_CLUSTERS_0_KAFKACONNECT_0_NAME: first
-      KAFKA_CLUSTERS_0_KAFKACONNECT_0_ADDRESS: http://kafka-connect:8083
     # volumes:
     #   - config/kafka_ui_config.yml:/etc/kafkaui/dynamic_config.yaml
 
@@ -183,7 +135,7 @@ services:
 
   alertmanager:
     container_name: alertmanager
-    image: prom/alertmanager
+    image: prom/alertmanager:v0.25.0
     restart: always
     ports:
       - 9093:9093
@@ -214,7 +166,7 @@ services:
 
   node-exporter:
     container_name: node-exporter
-    image: prom/node-exporter
+    image: prom/node-exporter:v1.5.0
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro

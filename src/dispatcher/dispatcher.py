@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Consume data from Apache Kafka streams and upload it into Prometheus.
+Consume hotel review statistics from Apache Kafka streams and upload it into Prometheus.
 
 Usage: dispatcher.py
 """
@@ -10,7 +10,7 @@ import json
 from time import sleep
 from typing import List
 from confluent_kafka import Consumer, Message, KafkaError, KafkaException
-from prometheus_client import start_http_server, Counter, Gauge, CollectorRegistry, pushadd_to_gateway
+from prometheus_client import start_http_server, Counter, Gauge
 
 # Define Kafka properties
 conf = {
@@ -22,11 +22,15 @@ conf = {
 
 MIN_COMMIT_COUNT = 5
 
-# Create a registry and a gauge metric
-registry = CollectorRegistry()
 # Define Prometheus metrics
 reviews_processed_total = Counter("hotel_reviews_ratings_processed_total", "Total number of messages processed")
-review_rating = Gauge("hotel_review_rating", "Rating of the review", ["review"], registry=registry)
+review_min_length = Gauge("hotel_review_min_review_length", "Min length of the review")
+review_max_length = Gauge("hotel_review_max_review_length", "Max length of the review")
+review_avg_length = Gauge("hotel_review_avg_review_length", "Avg length of the review")
+review_avg_rating = Gauge("hotel_review_avg_review_rating", "Avg rating of the review")
+review_min_processing_time_ms = Gauge("hotel_review_min_processing_time_ms", "Min processing time of the review")
+review_max_processing_time_ms = Gauge("hotel_review_max_processing_time_ms", "Max processing time of the review")
+review_avg_processing_time_ms = Gauge("hotel_review_avg_processing_time_ms", "Avg processing time of the review")
 
 def upload_to_prometheus(message: Message) -> None:
     """Transform the message to prometheus format and upload it.
@@ -46,15 +50,18 @@ def upload_to_prometheus(message: Message) -> None:
     print("%s Key: %s; Value: %s" % (timestamp, key, val_json))
     print("******")
 
-    review = val_json["review"]
-    rating = val_json["rating"]
-
-    reviews_processed_total.inc()
-    # Upload a review with a rating
-    review_rating.labels(review=review).set(rating)
-    # TODO: potentialy transform to push to Prometheus so upload only once
-    # it will update the existing metric with the new value instead of creating a new metric.
-    # pushadd_to_gateway('prometheus:9090', job='hotel-reviews', registry=registry, grouping_key={'review': review})
+    # update metrics
+    try:
+        reviews_processed_total.inc()
+        review_min_length.set(val_json["min_review_length"])
+        review_max_length.set(val_json["max_review_length"])
+        review_avg_length.set(val_json["avg_review_length"])
+        review_avg_rating.set(val_json["avg_rating"])
+        review_min_processing_time_ms.set(val_json["min_time_diff_ms"])
+        review_max_processing_time_ms.set(val_json["max_time_diff_ms"])
+        review_avg_processing_time_ms.set(val_json["avg_time_diff_ms"])
+    except Exception as e:
+        print(e)
 
 running = True
 def consume_loop(consumer: Consumer, topics: List[str]):
@@ -99,4 +106,4 @@ if __name__ == "__main__":
 
     consumer = Consumer(conf)
     # start the Kafka consumer loop
-    consume_loop(consumer, ["hotel-reviews-ratings"])
+    consume_loop(consumer, ["statistics"])

@@ -64,7 +64,8 @@ if __name__ == "__main__":
     df = df \
         .withColumn("review_length", f.length(f.col("review")))
 
-    # Group the data with a Sliding Window with the window size of 5 minutes and the slide interval of 30 seconds.
+    # Group the data with a sliding window with the window size of 5 minutes
+    # and the slide interval of 30 seconds.
     # The window is defined by the processing time.
     df = df \
         .groupBy(f.window(f.col("processing_time"), "5 minutes", "30 seconds"))        
